@@ -16,16 +16,15 @@ Usage
 First include the `waybetter.js` in your document, towards the bottom...right? Then call `$elem.waybetter()`.
 
 ```html
-	<script type="text/javascript" src="waybetter.js"></script>
-	<script type="text/javascript">
-		$("#item").waybetter();
-	</script>
-</body>
+<script type="text/javascript" src="waybetter.js"></script>
+<script type="text/javascript">
+	$("#item").waybetter();
+</script>
 ```
 
 This would result in the below when `#item` scrolled into the viewport.
 
-```html
+```
 <div id="item" data-waybetter="true">Lorem ipsum...</div>
 ```
 
@@ -35,7 +34,7 @@ Options
 
 Options can be passed to the waybetter function at initialization, otherwise it must be followed by the refresh method.
 
-```html
+```
 $("#item").waybetter({ direction : "horizontal" });
 
 later...
@@ -76,7 +75,7 @@ Methods
 
 This method stops all waybetter points within the document
 
-```script
+```
 $(document).waybetter('destroy');
 ```
 
@@ -84,7 +83,7 @@ $(document).waybetter('destroy');
 
 Check whether a given item is within the viewport.  
 
-```html
+```
 $("#item").waybetter('inview');
 ```
 
@@ -95,7 +94,7 @@ returns `boolean`
 
 This will refresh all matched waybetter points. This is useful if you want to set different options after initialization.  
 
-```html
+```
 $("#item").waybetter('refresh');
 ```
 
