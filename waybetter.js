@@ -27,7 +27,7 @@
 	init = function( options ) { 
     	var that = this;
         
-        API.settings = $.extend({ direction: 'vertical', threshold: 0, context: window }, options );
+        API.settings = $.extend({ direction: 'vertical', threshold: 0, viewport: window }, options );
 	  	
 	  	$win.on( scroll + " " + resize, function() { process.apply( that ); });
 	  	$doc.trigger( wbName + ".ready" );
@@ -36,24 +36,24 @@
 	isInView = function() {
 	    var direction = API.settings.direction,
 	    	threshold = API.settings.threshold,
-	    	context = $( API.settings.context ),
+	    	viewport = $( API.settings.viewport ),
 	    	offset = this.offset();
 
 	    if ( direction === "vertical" ) {
 	    	var elOffset = offset.top, 
 	    		elSize = this.outerHeight(), 
-	    		contextScroll = context.scrollTop(), 
-	    		contextSize = context.outerHeight();
+	    		viewportScroll = viewport.scrollTop(), 
+	    		viewportSize = viewport.outerHeight();
 	    } else {
 	    	var elOffset = offset.left, 
 	    		elSize = this.outerWidth(), 
-	    		contextScroll = context.scrollLeft(), 
-	    		contextSize = context.outerWidth();
+	    		viewportScroll = viewport.scrollLeft(), 
+	    		viewportSize = viewport.outerWidth();
 	    }
 	    
-	    var elOffsetFromcontext = ( contextScroll - elOffset );
+	    var elOffsetFromviewport = ( viewportScroll - elOffset );
 
-	    return  ( elOffsetFromcontext < (elSize - threshold)) && (elOffsetFromcontext > (threshold - contextSize));
+	    return  ( elOffsetFromviewport < (elSize - threshold)) && (elOffsetFromviewport > (threshold - viewportSize));
 	},
 	process = function() {
 	    return  $(this).each(function() {
@@ -78,14 +78,14 @@
 		});
 	},
 	API = {
-		waybettercontext: (function() {
-			var context = $( API.settings.context );
+		waybetterviewport: (function() {
+			var viewport = $( API.settings.viewport );
 
 			return {
-				height: context.outerHeight(),
-				left: context.scrollLeft(),
-				top: context.scrollTop(),
-				width: context.outerWidth()
+				height: viewport.outerHeight(),
+				left: viewport.scrollLeft(),
+				top: viewport.scrollTop(),
+				width: viewport.outerWidth()
 			}
 		}),
 		settings: null,
