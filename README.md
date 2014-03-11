@@ -44,22 +44,27 @@ Options can be passed to the waybetter function at initialization, otherwise it 
 	$("#item").waybetter({ direction : "horizontal" });
 ```
 
-### direction=vertical `string`
+### direction=vertical
 
 Possible values : 'vertical' || 'horizontal'
 
+`string`
 
-### threshold=0 `number`
+
+### threshold=0
 
 A positive value will cause the function to wait to trigger until that many pixels after the element has reached the viewport.
 
 Conversely a negative value will cause the function to trigger that many pixels before the element has reached the viewport.
 
+`number`
 
-### viewport=window `DOM Element` or `jQuery Element` or `string selector`
+
+### viewport=window
 
 This is the viewport that the position of the scrolling element is compared to. This will typically remain as window
 
+`DOM Element` or `jQuery Element` or `string selector`
 
 
 Methods
@@ -69,14 +74,17 @@ Methods
 
 This method stops all waybetter points within the document
 
-`$(document).waybetter('destroy');`
-
+```html
+$(document).waybetter('destroy');
+```
 
 ### inview
 
 Check whether a given item is within the viewport.  
 
-`$("#item").waybetter('inview');`
+```html
+$("#item").waybetter('inview');
+```
 
 returns `boolean`
 
@@ -85,5 +93,7 @@ returns `boolean`
 
 This will refresh all matched waybetter points. This is useful if you want to set different options after initialization.  
 
-`$("#item").waybetter('refresh');`
+```html
+$("#item").waybetter('refresh');
+```
 
