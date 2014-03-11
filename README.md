@@ -7,23 +7,23 @@ Easy to use plugin to fire events when elements come into frame. Not much js ski
 Requirements 
 ------------
 
-jQuery 1.7, this is due to a single `on` event, I would think it would be fairly easy to get this to work with < jQuery 1.4
+jQuery 1.7, this is due to a single `on` event, would be super easy to get to work with < jQuery 1.4
 
 
 Usage
 ------
 
-First include the `skrollr.js` in your document, towards the bottom...right? Then call `$elem.waybetter()`.
+First include the `waybetter.js` in your document, towards the bottom...right? Then call `$elem.waybetter()`.
 
 ```html
-	<script type="text/javascript" src="waybetter.min.js"></script>
+	<script type="text/javascript" src="waybetter.js"></script>
 	<script type="text/javascript">
 		$("#item").waybetter();
 	</script>
 </body>
 ```
 
-This would result in the below when `#item`
+This would result in the below when `#item` scrolled into the viewport.
 
 ```html
 <div id="item" data-waybetter="true">Lorem ipsum...</div>
@@ -31,45 +31,52 @@ This would result in the below when `#item`
 
 
 Options
------
+-------
 
 Options can be passed to the waybetter function at initialization, otherwise it must be followed by the refresh method.
 
 ```html
-	$("#item").waybetter({ direction : "horizontal" });
+$("#item").waybetter({ direction : "horizontal" });
+
+later...
+
+$("#item").waybetter({ threshold : 50 }).waybetter('refresh');
 ```
 
 ### direction=vertical
 
-Possible values : 'vertical' || 'horizontal'
-
 `string`
+
+Possible values: *vertical* or *horizontal*
+
 
 
 ### threshold=0
+
+`number`
 
 A positive value will cause the function to wait to trigger until that many pixels after the element has reached the viewport.
 
 Conversely a negative value will cause the function to trigger that many pixels before the element has reached the viewport.
 
-`number`
 
 
 ### viewport=window
 
-This is the viewport that the position of the scrolling element is compared to. This will typically remain as window
-
 `DOM Element` or `jQuery Element` or `string selector`
+
+This is the viewport that the position of the scrolling element is compared to. This will typically remain as window.
+
 
 
 Methods
------
+-------
 
 ### destroy
 
 This method stops all waybetter points within the document
 
-```html
+```script
 $(document).waybetter('destroy');
 ```
 
