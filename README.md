@@ -4,11 +4,6 @@ Waybetter
 Easy to use plugin to fire events when elements come into frame. Not much js skills needed. A better replacement for jQuery Waypoints.
 
 
-Documentation
--------------
-
-First of all: look at the [examples and read the source ;-)](https://github.com/Prinzhorn/skrollr/tree/master/examples). This might give you a feeling of how stuff works and you can see how some patterns can be implemented.
-
 Requirements 
 ------------
 
