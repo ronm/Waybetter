@@ -5,12 +5,12 @@ Easy to use plugin to fire events when elements come into frame. Not much js ski
 
 
 Documentation
-=============
+-------------
 
 First of all: look at the [examples and read the source ;-)](https://github.com/Prinzhorn/skrollr/tree/master/examples). This might give you a feeling of how stuff works and you can see how some patterns can be implemented.
 
 Requirements 
-------
+------------
 
 jQuery 1.7, this is due to a single `on` event, I would think it would be fairly easy to get this to work with < jQuery 1.4
 
