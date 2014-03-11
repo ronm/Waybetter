@@ -10,17 +10,11 @@
 		resize = "resize." + wbName,
 
 	methods = {
-		destroy: function() {
-			var that = $(this);
-			$win.off( scroll + " " + resize );
-
-			$( '[data-' + wbName + ']' )
-			$( '[data-' + wbName + ']' ).removeAttr( "data-" + wbName );
-			$doc.trigger( wbName + ".destroyed" );
-		},
+		destroy: function() { $(this).data(wbName + 'Ignore', true).trigger( wbName + ".destroyed" ).removeAttr( "data-" + wbName ); },
+		enable: function() { $(this).data(wbName + 'Ignore', false).trigger( wbName + ".enabled" ); $(this).waybetter("refresh"); },
 	    inview : (function() { return isInView.apply( this ); }),
 	    refresh : (function() { 
-	    	$doc.trigger( wbName + ".refreshed" );
+	    	$(this).trigger( wbName + ".refreshed" );
 	    	return process.apply( this ); 
 	    }),
 	},
@@ -56,7 +50,7 @@
 	    return  ( elOffsetFromviewport < (elSize - threshold)) && (elOffsetFromviewport > (threshold - viewportSize));
 	},
 	process = function() {
-	    return  $(this).each(function() {
+	    return  $(this).filter(function() { return !$(this).data(wbName + 'Ignore'); }).each(function() {
 	    	var $this = $( this ), 
 	    		updatedInview = isInView.apply( $this ),
 	    		thisData =  $this.data( wbName ),
