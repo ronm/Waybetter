@@ -34,13 +34,13 @@ Options
 
 Options can be passed to the waybetter function at initialization, otherwise it must be followed by the refresh method.
 
-```html
+```
 $("#item").waybetter({ direction : "horizontal" });
 ```
 
 later...
 
-```html
+```
 $("#item").waybetter({ threshold : 50 }).waybetter('refresh');
 ```
 
@@ -77,7 +77,7 @@ Methods
 
 This method stops all waybetter points within the document
 
-```html
+```
 $(document).waybetter('destroy');
 ```
 
@@ -85,7 +85,7 @@ $(document).waybetter('destroy');
 
 Check whether a given item is within the viewport.  
 
-```html
+```
 $("#item").waybetter('inview');
 ```
 
@@ -96,7 +96,7 @@ returns `boolean`
 
 This will refresh all matched waybetter points. This is useful if you want to set different options after initialization.  
 
-```html
+```
 $("#item").waybetter('refresh');
 ```
 
