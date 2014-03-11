@@ -44,23 +44,21 @@ Options can be passed to the waybetter function at initialization, otherwise it 
 	$("#item").waybetter({ direction : "horizontal" });
 ```
 
-### direction=vertical
+### direction=vertical `string`
 
-`string` Possible values : 'vertical' || 'horizontal'
+Possible values : 'vertical' || 'horizontal'
 
 
-### threshold=0
-
-`number`
+### threshold=0 `number`
 
 A positive value will cause the function to wait to trigger until that many pixels after the element has reached the viewport.
 
 Conversely a negative value will cause the function to trigger that many pixels before the element has reached the viewport.
 
 
-### viewport=window
+### viewport=window `DOM Element` or `jQuery Element` or `string selector`
 
-`DOM Element` or `jQuery Element` or `string selector` This is the viewport that the position of the scrolling element is compared to. This will typically remain as window
+This is the viewport that the position of the scrolling element is compared to. This will typically remain as window
 
 
 
