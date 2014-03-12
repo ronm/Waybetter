@@ -8,29 +8,30 @@
 		outview = 'outview',
 		scroll = "scroll." + wbName,
 		resize = "resize." + wbName,
+		settings;
 
 	methods = {
-		destroy: function() { $(this).data(wbName + 'Ignore', true).trigger( wbName + ".destroyed" ).removeAttr( "data-" + wbName ); },
-		enable: function() { $(this).data(wbName + 'Ignore', false).trigger( wbName + ".enabled" ); $(this).waybetter("refresh"); },
+		destroy: function() { this.data(wbName + 'Ignore', true).trigger( wbName + ".destroyed" ).removeAttr( "data-" + wbName ); },
+		enable: function() { this.data(wbName + 'Ignore', false).trigger( wbName + ".enabled" ).waybetter("refresh"); },
 	    inview : (function() { return isInView.apply( this ); }),
 	    refresh : (function() { 
-	    	$(this).trigger( wbName + ".refreshed" );
+	    	this.trigger( wbName + ".refreshed" );
 	    	return process.apply( this ); 
 	    }),
 	},
 	init = function( options ) { 
     	var that = this;
-        
-        API.settings = $.extend({ direction: 'vertical', threshold: 0, viewport: window }, options );
+    	
+    	settings = $.extend( $.fn.waybetter.settings, options );
 	  	
 	  	$win.on( scroll + " " + resize, function() { process.apply( that ); });
 	  	$doc.trigger( wbName + ".ready" );
 	  	return process.apply( that );
 	},	
 	isInView = function() {
-	    var direction = API.settings.direction,
-	    	threshold = API.settings.threshold,
-	    	viewport = $( API.settings.viewport ),
+	    var direction = settings.direction,
+	    	threshold = settings.threshold,
+	    	viewport = $( settings.viewport ),
 	    	offset = this.offset();
 
 	    if ( direction === "vertical" ) {
@@ -50,7 +51,7 @@
 	    return  ( elOffsetFromviewport < (elSize - threshold)) && (elOffsetFromviewport > (threshold - viewportSize));
 	},
 	process = function() {
-	    return  $(this).filter(function() { return !$(this).data(wbName + 'Ignore'); }).each(function() {
+	    return  this.filter(function() { return !$(this).data(wbName + 'Ignore'); }).each(function() {
 	    	var $this = $( this ), 
 	    		updatedInview = isInView.apply( $this ),
 	    		thisData =  $this.data( wbName ),
@@ -70,32 +71,21 @@
 	    		}
 			}
 		});
-	},
-	API = {
-		waybetterviewport: (function() {
-			var viewport = $( API.settings.viewport );
-
-			return {
-				height: viewport.outerHeight(),
-				left: viewport.scrollLeft(),
-				top: viewport.scrollTop(),
-				width: viewport.outerWidth()
-			}
-		}),
-		settings: null,
-		version: '1'
 	};
-
+	
 	$.fn.waybetter = function( method ) {
-   	    if ( typeof method === 'object' || ! method ) {
+   	    if ( ! method || $.isFunction( method ) || $.isPlainObject( method ) ) {
 	      return init.apply( this, arguments );
 	    } else if ( methods[method] ) {
 	      return methods[ method ].apply( this, Array.prototype.slice.call( arguments, 1 ));
 	    } else {
-	      $.error( 'Method ' +  method + ' does not exist on jQuery.waybetter' );
-	    }    
+	      $.error( 'Method ' +  method + ' does not exist on Waybetter' );
+	    }   
 	};
 	
-	//$.fn.waybetter.API = API;
+	$.fn.waybetter.settings = { direction: 'vertical', 
+								threshold: 0, 
+								viewport: window 
+							  };
 
 })( window, jQuery );
