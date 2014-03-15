@@ -13,7 +13,7 @@ jQuery 1.7, this is due to a single `on` event, would be super easy to get to wo
 Usage
 ------
 
-First include the `waybetter.js` in your document, towards the bottom...right? Then call `$elem.waybetter()`.
+First include the `waybetter.min.js` in your document, towards the bottom...right? Then call `$elem.waybetter()`.
 
 ```html
 <script type="text/javascript" src="waybetter.js"></script>
