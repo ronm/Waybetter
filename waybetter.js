@@ -1,37 +1,47 @@
 (function( window, $ ){
+	"use strict";
 	
-	var $win = $(window),
-		$doc = $(document), 
-		wbName = 'waybetter',
-		dataName = "data-" + wbName,
-		inview = 'inview',
-		outview = 'outview',
-		scroll = "scroll." + wbName,
-		resize = "resize." + wbName,
-		settings;
-
+	var name = 'waybetter',
 	methods = {
-		destroy: function() { this.data(wbName + 'Ignore', true).trigger( wbName + ".destroyed" ).removeAttr( "data-" + wbName ); },
-		enable: function() { this.data(wbName + 'Ignore', false).trigger( wbName + ".enabled" ).waybetter("refresh"); },
+		destroy: function() { 
+			return this.each(function() {
+				var i = $.inArray(this, $.fn.waybetter.elements);
+				if ( i > -1 ) {
+					$.fn.waybetter.elements.splice(i, 1);
+					$(this).data(name, { inview: false }).removeAttr( "data-" + name ).trigger( name + ".destroyed" );
+				}
+			});
+		},
+		enable: function() {
+			this.waybetter().trigger( name + ".enabled" );
+		},
 	    inview : (function() { return isInView.apply( this ); }),
 	    refresh : (function() { 
-	    	this.trigger( wbName + ".refreshed" );
+	    	this.trigger( name + ".refreshed" );
 	    	return process.apply( this ); 
 	    }),
 	},
 	init = function( options ) { 
-    	var that = this;
+    	$.fn.waybetter.settings = $.extend( $.fn.waybetter.settings, options );
     	
-    	settings = $.extend( $.fn.waybetter.settings, options );
-	  	
-	  	$win.on( scroll + " " + resize, function() { process.apply( that ); });
-	  	$doc.trigger( wbName + ".ready" );
-	  	return process.apply( that );
-	},	
+    	if ( !$.fn.waybetter.elements ) {
+	    	$.fn.waybetter.elements = this.slice(0, this.length);
+	    	$(window).on( "scroll." + name + " " + "resize." + name, function() { process.apply( $( $.fn.waybetter.elements ) ); });
+    	} else {	
+	    	this.each(function() { 
+	    		if ( $.inArray(this, $.fn.waybetter.elements) === -1 ) {
+		    		$.fn.waybetter.elements.push( this );	
+	    		}
+	    	});
+    	}
+
+	  	return process.apply( $.fn.waybetter.elements );
+	},
+	isInRange = function( n, a, b) { return ( a < n && n < b ); },
 	isInView = function() {
-	    var direction = settings.direction,
-	    	threshold = settings.threshold,
-	    	viewport = $( settings.viewport ),
+	    var direction = $.fn.waybetter.settings.direction,
+	    	threshold = $.fn.waybetter.settings.threshold,
+	    	viewport = $( $.fn.waybetter.settings.viewport ),
 	    	offset = this.offset();
 
 	    if ( direction === "vertical" ) {
@@ -47,27 +57,24 @@
 	    }
 	    
 	    var elOffsetFromviewport = ( viewportScroll - elOffset );
-
-	    return  ( elOffsetFromviewport < (elSize - threshold)) && (elOffsetFromviewport > (threshold - viewportSize));
+		
+		return isInRange(elOffsetFromviewport, (threshold - viewportSize), (elSize - threshold));
 	},
 	process = function() {
-	    return  this.filter(function() { return !$(this).data(wbName + 'Ignore'); }).each(function() {
+	    return this.each(function() {
 	    	var $this = $( this ), 
+	    		settings = $.fn.waybetter.settings,
 	    		updatedInview = isInView.apply( $this ),
-	    		thisData =  $this.data( wbName ),
+	    		thisData =  $this.data( name ),
 	    		setInview = thisData && thisData.inview,
 	    		movedInView = updatedInview && !setInview,
-	    		movedOutView = !updatedInview && setInview,
-	    		updated = movedInView || movedOutView;
-
-	    	if ( updated ) {
-
-	    		$this.data(wbName, { inview: updatedInview });
-
+	    		movedOutView = !updatedInview && setInview;
+	    					
+	    	if ( movedInView || movedOutView ) {
 	    		if ( movedInView ) {
-	    			$this.trigger( wbName + '.' + inview ).attr( dataName, true );
+		    		$this.data(name, { inview: true }).attr( "data-" + name, true ).trigger( name + '.inview' );
 	    		} else if ( movedOutView ) {
-	    			$this.trigger( wbName + '.' + outview ).removeAttr( dataName );
+					$this.data(name, { inview: false }).removeAttr( "data-" + name ).trigger( name + '.outview' );
 	    		}
 			}
 		});
@@ -83,9 +90,7 @@
 	    }   
 	};
 	
-	$.fn.waybetter.settings = { direction: 'vertical', 
-								threshold: 0, 
-								viewport: window 
-							  };
+	$.fn.waybetter.elements;
+	$.fn.waybetter.settings = { direction: 'vertical', threshold: 0, viewport: window };
 
 })( window, jQuery );
