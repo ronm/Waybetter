@@ -16,7 +16,7 @@ Usage
 First include the `waybetter.min.js` in your document, towards the bottom...right? Then call `$elem.waybetter()`.
 
 ```html
-<script type="text/javascript" src="waybetter.js"></script>
+<script type="text/javascript" src="waybetter.min.js"></script>
 <script type="text/javascript">
 	$("#item").waybetter();
 </script>
