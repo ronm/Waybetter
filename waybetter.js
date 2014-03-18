@@ -1,8 +1,10 @@
-/*	waybetter
-	by Ron Marcelle
-	Licensed under MIT
-*/
-
+/**************************/
+/*** waybetter ************/
+/*** by Ron Marcelle ******/
+/*** Licensed under MIT ***/
+/**************************/
+/* debounce function taken pretty */
+/* direcly from underscore.js...thanks. */
 (function( window, $ ){
 	"use strict";
 	
