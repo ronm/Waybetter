@@ -7,7 +7,7 @@ Easy to use plugin to fire events when elements come into frame. Not much js ski
 Requirements 
 ------------
 
-jQuery 1.7, this is due to a single `on` event, would be super easy to get to work with < jQuery 1.4
+jQuery 1.2.3+
 
 
 Usage
@@ -25,8 +25,11 @@ First include the `waybetter.min.js` in your document, towards the bottom...righ
 This would result in the below when `#item` scrolled into the viewport.
 
 ```html
-<div id="item" data-waybetter="true">Lorem ipsum...</div>
+<div id="item" data-waybetter>Lorem ipsum...</div>
 ```
+
+Tip: you can also tell waybetter to watch elements on load by adding the attribute ```data-waybetter-watch``` to any element.
+
 
 
 Options
@@ -43,6 +46,14 @@ later...
 ```
 $("#item").waybetter({ threshold : 50 }).waybetter('refresh');
 ```
+
+### debounce=0
+
+`number`
+
+How often during scrolling and resizing should waybetter reprocess the DOM. Default zero is no debounce, otherwise integer is milliseconds.
+
+
 
 ### direction=vertical
 
