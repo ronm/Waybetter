@@ -5,27 +5,49 @@
 /**************************/
 /* debounce function taken pretty */
 /* direcly from underscore.js...thanks. */
-(function( window, $ ){
+(function( window ){
 	"use strict";
-	
+
 	var name = 'waybetter',
+	waybetter = function( sel, method ) {
+   	    if ( ! method || typeof(method) === "function" || typeof(method) === "object" ) {
+	      return init.apply( sel, Array.prototype.slice.call( arguments, 1 ) );
+	    } else if ( methods[method] ) {
+	      return methods[ method ].apply( sel, Array.prototype.slice.call( arguments, 2 ));
+	    }
+	},
+	createEvent = function(evName) {
+		if ( typeof Event !== "undefined" ) {
+			return new Event(name + "." + evName);
+		} else {
+			var evt = document.createEvent(name + '.refreshed');
+			evt.initEvent("custom", true, true);
+			return evt;
+		}
+	},
+	extend = function(a, b){
+	    for(var key in b) { if(b.hasOwnProperty(key)) { a[key] = b[key]; } }
+	    return a;
+	},
 	methods = {
-		destroy: function() { 
-			return this.each(function() {
-				var i = $.inArray(this, $.fn.waybetter.elements);
+		destroy: function() {
+			return ( this.length ? this : [this] ).forEach(function(el) {
+				var i = waybetter.elements.indexOf(el);
 				if ( i > -1 ) {
-					$.fn.waybetter.elements.splice(i, 1);
-					$(this).data(name, { inview: false }).removeAttr( "data-" + name ).trigger( name + ".destroyed" );
-				}
+					waybetter.elements.splice(i, 1);
+					el[name].inview = false;
+					el.removeAttribute("data-" + name);
+					el.dispatchEvent( createEvent("inview") ); }
 			});
 		},
 		enable: function() {
-			this.waybetter().trigger( name + ".enabled" );
+			init.apply( this );
+			this.dispatchEvent(createEvent("enabled"));
 		},
 	    inview : (function() { return isInView.apply( this ); }),
-	    refresh : (function() { 
-	    	this.trigger( name + ".refreshed" );
-	    	return process.apply( this ); 
+	    refresh : (function() {
+			this.dispatchEvent(createEvent("refresh"));
+	    	return process.apply( this );
 	    }),
 	},
 	debounce = function(func, wait, immediate) {
@@ -43,82 +65,66 @@
 			if (callNow) func.apply(context, args);
 		};
 	},
-	init = function( options ) { 
-    	$.fn.waybetter.settings = $.extend( $.fn.waybetter.settings, options );
-    	if ( !$.fn.waybetter.elements ) {
-	    	$.fn.waybetter.elements = this.slice(0, this.length);
-	    	$(window).bind( "scroll." + name + " " + "resize." + name, debounce(function() { 
-	    		process.apply( $( $.fn.waybetter.elements ) );
-			}, $.fn.waybetter.settings.debounce));
-    	} else {	
-	    	this.each(function() { 
-	    		if ( $.inArray(this, $.fn.waybetter.elements) === -1 ) {
-		    		$.fn.waybetter.elements.push( this );	
-	    		}
+	init = function( options ) {
+		waybetter.settings = extend( waybetter.settings, options );
+		var els = ( this.length ? this : [this] );
+		els.forEach(function(el) { el[name] = {}; });
+
+    	if ( !waybetter.elements ) {
+	    	waybetter.elements = els.slice(0, this.length);
+			["scroll", "resize"].forEach(function(event){
+				window.addEventListener(event, debounce(function() {
+		    		process.apply( waybetter.elements );
+				}, waybetter.settings.debounce));
+			});
+    	} else {
+	    	els.each(function() {
+				if ( waybetter.elements.indexOf(els) === -1 ) { waybetter.elements.push( els ); }
 	    	});
     	}
 
-	  	return process.apply( $.fn.waybetter.elements );
+	  	return process.apply( waybetter.elements );
 	},
-	isInRange = function( n, a, b) { return ( a < n && n < b ); },
 	isInView = function() {
-	    var direction = $.fn.waybetter.settings.direction,
-	    	threshold = $.fn.waybetter.settings.threshold,
-	    	viewport = $( $.fn.waybetter.settings.viewport ),
-	    	offset = this.offset();
-
-	    if ( direction === "vertical" ) {
-	    	var elOffset = offset.top, 
-	    		elSize = this.outerHeight(), 
-	    		viewportScroll = viewport.scrollTop(), 
-	    		viewportSize = viewport.outerHeight();
-	    } else {
-	    	var elOffset = offset.left, 
-	    		elSize = this.outerWidth(), 
-	    		viewportScroll = viewport.scrollLeft(), 
-	    		viewportSize = viewport.outerWidth();
-	    }
-	    
-	    var elOffsetFromviewport = ( viewportScroll - elOffset );
+	    var threshold = waybetter.settings.threshold,
+	    	viewport = waybetter.settings.viewport,
+			bounds = this.getBoundingClientRect();
 		
-		return isInRange(elOffsetFromviewport, (threshold - viewportSize), (elSize - threshold));
+		return ( waybetter.settings.direction === "vertical" ? (bounds.bottom + threshold >= 0 && bounds.top + threshold <= viewport.clientHeight) : (bounds.right + threshold >= 0 && bounds.left + threshold <= viewport.clientWidth) );
 	},
 	process = function() {
-	    return this.each(function() {
-	    	var $this = $( this ), 
-	    		settings = $.fn.waybetter.settings,
-	    		updatedInview = isInView.apply( $this ),
-	    		thisData =  $this.data( name ),
+	    return this.forEach(function(el) {
+	    	var settings = waybetter.settings,
+	    		updatedInview = isInView.apply( el ),
+	    		thisData =  el[name],
 	    		setInview = thisData && thisData.inview,
 	    		movedInView = updatedInview && !setInview,
 	    		movedOutView = !updatedInview && setInview;
-	    					
+
 	    	if ( movedInView || movedOutView ) {
 	    		if ( movedInView ) {
-		    		$this.data(name, { inview: true }).attr( "data-" + name, "" ).trigger( name + '.inview' );
+					el[name].inview = true;
+					el.setAttribute("data-" + name, "");
+
+					el.dispatchEvent(createEvent("inview"));
 	    		} else if ( movedOutView ) {
-					$this.data(name, { inview: false }).removeAttr( "data-" + name ).trigger( name + '.outview' );
+					el[name].inview = false;
+					el.removeAttribute("data-" + name);
+
+					el.dispatchEvent(createEvent("outview"));
 	    		}
 			}
 		});
 	};
-	
-	$.fn.waybetter = function( method ) {
-   	    if ( ! method || $.isFunction( method ) || $.isPlainObject( method ) ) {
-	      return init.apply( this, arguments );
-	    } else if ( methods[method] ) {
-	      return methods[ method ].apply( this, Array.prototype.slice.call( arguments, 1 ));
-	    } else {
-	      $.error( 'Method ' +  method + ' does not exist on Waybetter' );
-	    }   
+
+	waybetter.elements = "";
+	waybetter.settings = {
+		debounce: 0,
+		direction: 'vertical',
+		threshold: 0,
+		viewport: document.body
 	};
-	
-	$.fn.waybetter.elements;
-	$.fn.waybetter.settings = { debounce: 0, direction: 'vertical', threshold: 0, viewport: window };
 
+	waybetter(document.querySelector('[data-' + name + '-watch]'));
 
-	$(function() {
-		$('[data-' + name + '-watch]').waybetter();
-	});
-
-})( window, jQuery );
+})( window );
