@@ -21,7 +21,7 @@
 			debounce: 0,
 			direction: 'vertical',
 			threshold: 0,
-			viewport: document.body
+			viewport: window
 		}, arguments[1] || {} );		
 
 		that.callback = debounce(function() { process.apply( that ); }, that.settings.debounce);
@@ -38,7 +38,7 @@
 			that.elements.forEach(function(element) {
 				element[name].inview = false;
 				element.removeAttribute("data-" + name);
-				element.dispatchEvent( createEvent("inview") );
+				element.dispatchEvent( new Event("inview") );
 
 				var i = waybetter.elements.indexOf(el);
 				if ( i > -1 ) { waybetter.elements.splice(i, 1); }
@@ -60,7 +60,7 @@
 	    that.inview = (function() { return isInView.apply( this ); });
 
 	    that.refresh = (function() {
-			this.dispatchEvent(createEvent("refresh"));
+			this.dispatchEvent( new Event("refresh") );
 	    	return process.apply( that );
 	    }); 
 
@@ -106,13 +106,16 @@
 		};
 	},
 	isInView = (function(el) {
+		
+		if ( el.length < 1 ) { return; }
+		
 	    var threshold = this.settings.threshold,
 	    	viewport = this.settings.viewport,
 			bounds = el.getBoundingClientRect();
 
 		return ( this.settings.direction === "vertical" ? 
-			(bounds.bottom + threshold >= 0 && bounds.top + threshold <= viewport.clientHeight) : 
-				(bounds.right + threshold >= 0 && bounds.left + threshold <= viewport.clientWidth) );
+			(bounds.bottom + threshold >= 0 && bounds.top + threshold <= (viewport.innerHeight || viewport.clientHeight) ) : 
+				(bounds.right + threshold >= 0 && bounds.left + threshold <= (viewport.innerWidth || viewport.clientWidth)) );
 	}),
 	process = function() {
 		var that = this;
@@ -123,16 +126,17 @@
 	    		setInview = thisData && thisData.inview,
 	    		movedInView = updatedInview && !setInview,
 	    		movedOutView = !updatedInview && setInview;
-
+				
+			
 	    	if ( movedInView || movedOutView ) {
 	    		if ( movedInView ) {
 					element[name].inview = true;
 					element.setAttribute("data-" + name, "");
-					element.dispatchEvent(createEvent("inview"));
+					element.dispatchEvent( new Event("inview") );
 	    		} else if ( movedOutView ) {
 					element[name].inview = false;
 					element.removeAttribute("data-" + name);
-					element.dispatchEvent(createEvent("outview"));
+					element.dispatchEvent( new Event("outview") );
 	    		}
 			}
 		});
@@ -142,7 +146,8 @@
 
 	waybetter.elements = [];
 
-	waybetter(document.querySelector('[data-' + name + '-watch]'), { direction: "vertical"});
+	var watch = document.querySelectorAll('[data-' + name + '-watch]');
+	if ( watch.length ) { waybetter(watch, { direction: "vertical"}); }
 
 	window.waybetter = waybetter;
 
