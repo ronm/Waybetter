@@ -47,7 +47,6 @@ p[waybetter] {
 
 
 
-<<<<<<< HEAD
 
 <script type="text/javascript" src="waybetter.js"></script>
 <script type="text/javascript">
@@ -57,21 +56,7 @@ p[waybetter] {
 	new Waybetter( document.querySelector(".another") ).watch();
 	document.addEventListener("waybetter.enter", handleEvent);
 	document.addEventListener("waybetter.exit", handleEvent);
-=======
-<script type="text/javascript" src="Waybetter.js"></script>
-<script type="text/javascript">
-(function() {
-	var watchMe = document.querySelector("p[data-waybetter-watch]"),
-		handleEvent = (function(evt) { console.log(evt.type, this); });
-		
-		
-	["in", "out"].forEach(function(evtType) { 
-		watchMe.addEventListener("waybetter." + evtType + "view", handleEvent); 
-	});
-	
-	new waybetter( document.querySelector(".another") );
->>>>>>> origin/master
-	
+
 })();</script>
 </body>
 </html>
