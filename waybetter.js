@@ -3,152 +3,169 @@
 /*** by Ron Marcelle ******/
 /*** Licensed under MIT ***/
 /**************************/
-/* debounce function taken pretty */
-/* direcly from underscore.js...thanks. */
-(function( window ){
-	"use strict";
 
-	var name = 'waybetter',
-	waybetter = (function( elements, options ) { return new Waybetter( elements, options ); }),
-	Waybetter = function() {
-		var that = this;
+(function (root, factory) {
+    if (typeof define === 'function' && define.amd) {
+        define([], factory);
+    } else if (typeof module === 'object' && module.exports) {
+        module.exports = factory();
+    } else {
+        root.Waybetter = factory();
+  }
+}(this, function () {
+	
+	let name = "waybetter";
 
-		that.elements = arguments[0].length ? arguments[0] : Array.prototype.slice.call( arguments, 0, 1 );
-
-		that.elements.forEach(function(el) { el[name] = {}; });
-
-		that.settings = extend( {
-			debounce: 0,
-			direction: 'vertical',
-			threshold: 0,
-			viewport: window
-		}, arguments[1] || {} );		
-
-		that.callback = debounce(function() { process.apply( that ); }, that.settings.debounce);
-
-		if ( !waybetter.elements.length ) { ["scroll", "resize"].forEach(function(evt){
-			window.addEventListener(evt, that.callback); 
-		}); }
-
-		that.elements.forEach(function(element) {
-			if ( waybetter.elements.indexOf(element) === -1 ) { waybetter.elements.push( element ); } 
-		});
-
-		that.destroy = function() {
-			that.elements.forEach(function(element) {
-				element[name].inview = false;
-				element.removeAttribute("data-" + name);
-				element.dispatchEvent( new Event("inview") );
-
-				var i = waybetter.elements.indexOf(el);
-				if ( i > -1 ) { waybetter.elements.splice(i, 1); }
-
-				that.callbacks.forEach(function(callback) {
-					element.removeEventListener(name + "." + inout + "view", callback);
-				});				
-			});
-
-			that.elements = [];
-
-			if ( !waybetter.elements.length ) {
-				["scroll", "resize"].forEach(function(evt){ window.removeEventListener(evt, that.callback); });
-			}
-
-			return that;
-		};
-
-	    that.inview = (function() { return isInView.apply( this ); });
-
-	    that.refresh = (function() {
-			this.dispatchEvent( new Event("refresh") );
-	    	return process.apply( that );
-	    }); 
-
-	    that.on = (function(inout, callback) {
-		    that.callbacks = that.callbacks ? that.callbacks : [];
-		    that.callbacks.push({inout: inout, callback: callback});
-		    
-		    that.elements.forEach(function(element) {
-			    element.addEventListener(name + "." + inout + "view", callback);
-		    });
-
-		    return that;
-	    });   
-
-	    return process.apply( that );
-	},
-	createEvent = function(evName) {
-		if ( typeof Event !== "undefined" ) {
-			return new Event(name + "." + evName);
-		} else {
-			var evt = document.createEvent(name + '.refreshed');
-			evt.initEvent("custom", true, true);
-			return evt;
-		}
-	},
-	extend = function(a, b){
-	    for(var key in b) { if(b.hasOwnProperty(key)) { a[key] = b[key]; } }
-	    return a;
-	},
-	debounce = function(func, wait, immediate) {
-		var timeout;
-		return function() {
-			var context = this, args = arguments,
-				later = function() {
-					timeout = null;
-					if (!immediate) func.apply(context, args);
-				},
-				callNow = immediate && !timeout;
-
-			clearTimeout(timeout);
-			timeout = setTimeout(later, wait);
-			if (callNow) func.apply(context, args);
-		};
-	},
-	isInView = (function(el) {
-		
-		if ( el.length < 1 ) { return; }
-		
-	    var threshold = this.settings.threshold,
-	    	viewport = this.settings.viewport,
-			bounds = el.getBoundingClientRect();
-
-		return ( this.settings.direction === "vertical" ? 
-			(bounds.bottom + threshold >= 0 && bounds.top + threshold <= (viewport.innerHeight || viewport.clientHeight) ) : 
-				(bounds.right + threshold >= 0 && bounds.left + threshold <= (viewport.innerWidth || viewport.clientWidth)) );
-	}),
-	process = function() {
-		var that = this;
-	    waybetter.elements.forEach(function(element) {
-	    	var settings = that.settings,
-	    		updatedInview = isInView.call( that, element ),
-	    		thisData =  element[name],
-	    		setInview = thisData && thisData.inview,
-	    		movedInView = updatedInview && !setInview,
-	    		movedOutView = !updatedInview && setInview;
-				
-			
-	    	if ( movedInView || movedOutView ) {
-	    		if ( movedInView ) {
-					element[name].inview = true;
-					element.setAttribute("data-" + name, "");
-					element.dispatchEvent( new Event("inview") );
-	    		} else if ( movedOutView ) {
-					element[name].inview = false;
-					element.removeAttribute("data-" + name);
-					element.dispatchEvent( new Event("outview") );
-	    		}
-			}
-		});
-
-		return that;
+	let defaultOptions = {
+		threshold: 0,
+		viewport: window, 
 	};
 
-	waybetter.elements = [];
+	class WaybetterElement {
+		constructor(item, opts = {}) {
+			this.node = item;
+			this.opts = Object.assign(defaultOptions, opts);
+			this.state = false;
+			this.enabled = true;
+		}
+		
+		inView() {//console.log(this)
+	    		var b = this.node.getBoundingClientRect(), t = this.opts.threshold, v = this.opts.viewport;
+	        return (b.bottom + t >= 0 && b.top + t <= v.innerHeight ) && (b.right + t >= 0 && b.left + t <= v.innerWidth);
+	    }
+		
+		trigger(type) {  
+	        let event;
+					
+	        try {
+	            event = new Event(name + "." + type, { 'bubbles': true });
+	        } catch (e) {
+	            event = document.createEvent('Event');
+	            event.initEvent(name + "." + type, true, true);
+	        }
+	
+			this.node.dispatchEvent( event )
+	    }
+		
+		enable() {
+			this.enabled = true;
+		}
+		
+		disable() {
+			this.enabled = false;
+		}
+	}
+		
+	return class Waybetter {
+	    constructor(items) {
+	        this.items = this._buildFromArray(items);
+			this.viewport = this.items.map(item => item.options && item.options.viewport)[0] || window;
+			this.enabled = true;
+			this._eventListener = () => this.refresh();
+		    this._init();
+	    }
+	
+	    refresh() {
+	        this._process();
+	    }
+	    
+	    add(items) {
+			this.items = this.items.concat(this._buildFromArray(items));
+	    }
+	    
+	    remove(node) {
+		    if ( Array.isArray(node) ) {
+				return node.forEach(n => this.remove(n));
+		    }
+			let index = this.items.findIndex(item => item.node === node);
+			return index > -1 ? this.items.splice(index, 1) : false;
+	    }
+		
+		enable() {
+			this.enabled = true;
+		}
+	
+		disable() {
+			this.enabled = false;
+		}
+		
+		find(node) {
+			return this.items.filter(item => item.node === node)[0];
+		}
+		
+		destroy() {
+			// delete event listners on viewport
+			this.viewport.removeEventListener("scroll", this._eventListener);
+			this.viewport.removeEventListener("resize", this._eventListener);
+			// remove waybtter attribute on all items
+			this.items.forEach(item => item.node.removeAttribute(name));
+		}
+		
+		watch() {
+			let els = document.querySelectorAll(`[${name}-watch]`);
+			if ( els.length ) {	this.add( [].slice.apply( els ) ); }
+	
+			// create an observer instance
+			var observer = new MutationObserver(mutations => {
+				mutations.forEach(mutation => { 
+					if (mutation.addedNodes.length) {
+						if ( mutation.addedNodes[0].nodeType !== 1 ) return;				
+						let watch = [].slice.apply( mutation.addedNodes[0].querySelectorAll(`[${name}-watch]`) );
+						if ( mutation.addedNodes[0].hasAttribute(`${name}-watch`) ) {
+							watch.push(mutation.addedNodes[0]);
+						}
 
-	var watch = document.querySelectorAll('[data-' + name + '-watch]');
-	if ( watch.length ) { waybetter(watch, { direction: "vertical"}); }
+						if ( watch.length ) { 
+							this.add(watch);
+							this.refresh();
+						}
+					} else if (mutation.removedNodes.length) {
+						if ( mutation.removedNodes[0].nodeType !== 1 ) return;					
+						let unWatch = [].slice.apply( mutation.removedNodes[0].querySelectorAll(`[${name}-watch]`) );
+	
+						if ( mutation.removedNodes[0].hasAttribute(`${name}-watch`) ) {
+							watch.push(mutation.removedNodes[0]);
+						}
 
-	window.waybetter = waybetter;
-
-})( window );
+						this.remove(unWatch);
+				   	}
+				});
+			});
+	
+			// pass in the target node, as well as the observer options
+			observer.observe(document.body, {childList: true, subtree: true});	
+			//observer.disconnect();
+			
+			return this;
+		}
+	
+		_init() {
+			this.viewport.addEventListener("scroll", this._eventListener);
+			this.viewport.addEventListener("resize", this._eventListener);
+			this.refresh();
+		}
+	    
+		_process() {
+			this.enabled && this.items.forEach(item => {
+				if ( item.enabled ) {
+					let inview = item.inView();
+					if ( inview !== item.state ) { 
+						item.state = inview;
+						inview ? item.node.setAttribute(name, "") : item.node.removeAttribute(name);
+						item.trigger(item.state?"enter":"exit")
+					}
+					if ( inview ) {
+						let bounds = item.node.getBoundingClientRect();
+						item.node.progress =  Math.min( 1, Math.max(0, 1 - (bounds.top + bounds.height)/window.innerHeight));
+						item.trigger("progress")
+					}
+				}
+			});	
+		}
+		
+		_buildFromArray(arr) {
+			let items = arr ? (arr.length ? (Array.isArray(arr) ? arr : [].slice.apply(arr)) : [arr]) : [];
+			return items.map(item => new WaybetterElement(item.element || item, item.options || {}));
+		}
+	}
+}));
