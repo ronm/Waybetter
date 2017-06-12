@@ -7,7 +7,7 @@ Easy to use plugin to fire events when elements come into frame. Not much js ski
 Usage
 ------
 
-```html
+```js
 import Waybetter from './waybetter'
 ```
 
@@ -19,7 +19,7 @@ or
 
 then
 
-```html
+```js
 var waybetter = new Waybetter().watch();
 document.on("waybetter.enter", function(event) { event.target.classList.add("animated"); });
 document.on("waybetter.exit", function(event) { event.target.classList.add("animated"); });
@@ -40,7 +40,7 @@ Options
 
 Options can be passed to the waybetter function at initialization, otherwise it must be followed by the refresh method.
 
-```
+```js
 new Waybetter({ direction : "horizontal" });
 ```
 
@@ -87,7 +87,7 @@ Methods
 
 This method stops all waybetter points within the document
 
-```
+```js
 let waybetter = new Waybetter();
 
 waybetter.destroy();
@@ -97,7 +97,7 @@ waybetter.destroy();
 
 Check whether a given item is within the viewport.  
 
-```
+```js
 let p = document.querySelector("p");
 
 p.hasAttribute("waybetter);
@@ -110,7 +110,7 @@ returns `boolean`
 
 This will refresh all matched waybetter points. This is useful if you want to set different options after initialization.  
 
-```
+```js
 let waybetter = new Waybetter();
 
 waybetter.refresh();
