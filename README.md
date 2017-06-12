@@ -4,31 +4,34 @@ Waybetter
 Easy to use plugin to fire events when elements come into frame. Not much js skills needed. A better replacement for jQuery Waypoints.
 
 
-Requirements 
-------------
-
-jQuery 1.2.3+
-
-
 Usage
 ------
 
-First include the `waybetter.min.js` in your document, towards the bottom...right? Then call `$elem.waybetter()`.
+```html
+import Waybetter from './waybetter'
+```
+
+or
 
 ```html
-<script type="text/javascript" src="waybetter.min.js"></script>
-<script type="text/javascript">
-	$("#item").waybetter();
-</script>
+<script type="text/javascript" src="waybetter.js"></script>
+```
+
+then
+
+```html
+var waybetter = new Waybetter().watch();
+document.on("waybetter.enter", function(event) { event.target.classList.add("animated"); });
+document.on("waybetter.exit", function(event) { event.target.classList.add("animated"); });
 ```
 
 This would result in the below when `#item` scrolled into the viewport.
 
 ```html
-<div id="item" data-waybetter>Lorem ipsum...</div>
+<div id="item" waybetter>Lorem ipsum...</div>
 ```
 
-Tip: you can also tell waybetter to watch elements on load by adding the attribute ```data-waybetter-watch``` to any element.
+Tip: you can also tell waybetter to watch elements on load by adding the attribute ```waybetter-watch``` to any element.
 
 
 
@@ -38,14 +41,10 @@ Options
 Options can be passed to the waybetter function at initialization, otherwise it must be followed by the refresh method.
 
 ```
-$("#item").waybetter({ direction : "horizontal" });
+new Waybetter({ direction : "horizontal" });
 ```
 
-later...
 
-```
-$("#item").waybetter({ threshold : 50 }).waybetter('refresh');
-```
 
 ### debounce=0
 
@@ -75,7 +74,7 @@ Conversely a negative value will cause the function to trigger that many pixels 
 
 ### viewport=window
 
-`DOM Element` or `jQuery Element` or `string selector`
+`DOM Element` or `string selector`
 
 This is the viewport that the position of the scrolling element is compared to. This will typically remain as window.
 
@@ -89,7 +88,9 @@ Methods
 This method stops all waybetter points within the document
 
 ```
-$(document).waybetter('destroy');
+let waybetter = new Waybetter();
+
+waybetter.destroy();
 ```
 
 ### inview
@@ -97,7 +98,9 @@ $(document).waybetter('destroy');
 Check whether a given item is within the viewport.  
 
 ```
-$("#item").waybetter('inview');
+let p = document.querySelector("p");
+
+p.hasAttribute("waybetter);
 ```
 
 returns `boolean`
@@ -108,6 +111,8 @@ returns `boolean`
 This will refresh all matched waybetter points. This is useful if you want to set different options after initialization.  
 
 ```
-$("#item").waybetter('refresh');
+let waybetter = new Waybetter();
+
+waybetter.refresh();
 ```
 
